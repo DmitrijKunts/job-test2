@@ -20,9 +20,11 @@ class UserController extends Controller
         if ($response->failed()) {
             abort($response->status(), $response['message'] ?? "");
         }
-        $next_url = Str::after($response->object()->links->next_url, $url);
-        $prev_url = Str::after($response->object()->links->prev_url, $url);
+
+        $next_url = $response->object()->links->next_url ? '?' . parse_url($response->object()->links->next_url, PHP_URL_QUERY) : '';
+        $prev_url = $response->object()->links->prev_url ? '?' . parse_url($response->object()->links->prev_url, PHP_URL_QUERY) : '';
         $users = $response->object()->users;
+
         return view('index', compact('users', 'next_url', 'prev_url'));
     }
 
