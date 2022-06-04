@@ -12,7 +12,7 @@ class UserController extends Controller
     {
         $url = config('app.rest_api_url') . '/users';
         try {
-            $response = Http::acceptJson()->get($url, $request->all());
+            $response = Http::acceptJson()->get($url, $request->all() + ['count' => 6]);
         } catch (\Exception $e) {
             abort(500, $e->getMessage());
         }

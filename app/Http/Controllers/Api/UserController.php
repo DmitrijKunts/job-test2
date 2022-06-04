@@ -31,7 +31,17 @@ class UserController extends Controller
     public function users(UsersGetRequest $request)
     {
         $validated = $request->validated();
-        $users = User::with('position')->paginate($request->count ?? 5);
+
+        $count = $request->count ?? 5;
+        if ($request->has('offset')) {
+            $users = User::with('position')->offset($request->offset)->limit($count)->get();
+        } else {
+            $users = User::with('position')->paginate($count);
+        }
+
+        if (isset($request->count)) {
+            $users->appends(['count' => $request->count]);
+        }
 
         if ($users->count() == 0) {
             return response()->json([
@@ -39,18 +49,26 @@ class UserController extends Controller
                 'message' => 'Page not found',
             ], 404);
         } else {
-            return response()->json([
+            $res = [
                 'success' => true,
-                'page' => $users->currentPage(),
-                'total_pages' => $users->lastPage(),
-                'total_users' => $users->total(),
-                'count' => $users->count(),
-                'links' => [
-                    'next_url' => $users->nextPageUrl(),
-                    'prev_url' => $users->previousPageUrl(),
-                ],
-                'users' => UserResource::collection($users),
-            ], 200);
+                'count' => $users->count()
+            ];
+            if (!$request->has('offset')) {
+                $res += [
+                    'page' => $users->currentPage(),
+                    'total_pages' => $users->lastPage(),
+                    'total_users' => $users->total(),
+                    'links' => [
+                        'next_url' => $users->nextPageUrl(),
+                        'prev_url' => $users->previousPageUrl(),
+                    ]
+                ];
+            }
+
+            return response()->json(
+                $res + ['users' => UserResource::collection($users)],
+                200
+            );
         }
     }
 
