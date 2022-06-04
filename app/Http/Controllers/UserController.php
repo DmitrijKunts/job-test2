@@ -18,7 +18,7 @@ class UserController extends Controller
         }
 
         if ($response->failed()) {
-            abort($response->status(), $response['message']);
+            abort($response->status(), $response['message'] ?? "");
         }
         $next_url = Str::after($response->object()->links->next_url, $url);
         $prev_url = Str::after($response->object()->links->prev_url, $url);
