@@ -66,46 +66,46 @@ class UserControllerTest extends TestCase
             ->assertJsonPath('fails.user_id', fn ($name) => $name != '');
     }
 
-    public function test_post_user()
-    {
-        $this->post('/api/v1/users')
-            ->assertStatus(409)
-            ->assertJson([
-                'success' => false,
-                'message' => 'The token expired.',
-            ]);
+    // public function test_post_user()
+    // {
+    //     $this->post('/api/v1/users')
+    //         ->assertStatus(409)
+    //         ->assertJson([
+    //             'success' => false,
+    //             'message' => 'The token expired.',
+    //         ]);
 
-        $response = $this->get('/api/v1/token');
-        self::$token = $response['token'];
+    //     $response = $this->get('/api/v1/token');
+    //     self::$token = $response['token'];
 
-        $this->withToken(self::$token)->post('/api/v1/users')
-            ->assertStatus(422)
-            ->assertJson([
-                'success' => false,
-                'message' => 'Validation failed',
-            ])
-            ->assertJsonPath('fails.name', fn ($name) => $name != '')
-            ->assertJsonPath('fails.email', fn ($name) => $name != '')
-            ->assertJsonPath('fails.phone', fn ($name) => $name != '')
-            ->assertJsonPath('fails.position_id', fn ($name) => $name != '')
-            ->assertJsonPath('fails.photo', fn ($name) => $name != '');
+    //     $this->withToken(self::$token)->post('/api/v1/users')
+    //         ->assertStatus(422)
+    //         ->assertJson([
+    //             'success' => false,
+    //             'message' => 'Validation failed',
+    //         ])
+    //         ->assertJsonPath('fails.name', fn ($name) => $name != '')
+    //         ->assertJsonPath('fails.email', fn ($name) => $name != '')
+    //         ->assertJsonPath('fails.phone', fn ($name) => $name != '')
+    //         ->assertJsonPath('fails.position_id', fn ($name) => $name != '')
+    //         ->assertJsonPath('fails.photo', fn ($name) => $name != '');
 
-        Storage::fake('avatars');
-        $avatar = UploadedFile::fake()->image('avatar.jpg', 100, 100);
+    //     Storage::fake('avatars');
+    //     $avatar = UploadedFile::fake()->image('avatar.jpg', 100, 100);
 
-        $response = $this->withToken(self::$token)->post('/api/v1/users', [
-            'name' => $this->faker()->name(),
-            'email' => $this->faker()->safeEmail(),
-            'phone' => $this->faker()->numerify('+380#########'),
-            'position_id' => $this->faker()->numberBetween(1, 4),
-            'photo' => $avatar,
-        ])->assertStatus(200)
-            ->assertJson([
-                'success' => true,
-                'message' => 'New user successfully registered',
-            ])
-            ->assertJsonPath('user_id', fn ($val) => is_int($val));
-    }
+    //     $response = $this->withToken(self::$token)->post('/api/v1/users', [
+    //         'name' => $this->faker()->name(),
+    //         'email' => $this->faker()->safeEmail(),
+    //         'phone' => $this->faker()->numerify('+380#########'),
+    //         'position_id' => $this->faker()->numberBetween(1, 4),
+    //         'photo' => $avatar,
+    //     ])->assertStatus(200)
+    //         ->assertJson([
+    //             'success' => true,
+    //             'message' => 'New user successfully registered',
+    //         ])
+    //         ->assertJsonPath('user_id', fn ($val) => is_int($val));
+    // }
 
     public function test_post_user_with_old_token()
     {
