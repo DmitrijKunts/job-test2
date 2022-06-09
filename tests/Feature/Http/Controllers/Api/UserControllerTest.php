@@ -112,7 +112,7 @@ class UserControllerTest extends TestCase
         Storage::fake('avatars');
         $avatar = UploadedFile::fake()->image('avatar.jpg', 100, 100);
 
-        $response = $this->withToken(self::$token)->post('/api/v1/users', [
+        $response = $this->withToken(self::$token ?? '')->post('/api/v1/users', [
             'name' => $this->faker()->name(),
             'email' => $this->faker()->safeEmail(),
             'phone' => $this->faker()->numerify('+380#########'),
